@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capivara Bot Chat</title>
+    <!-- Carrega o Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuração do tema (Cores escuras e brilho) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Cores base escuras
+                        'deep-dark': '#0a1917', // Fundo principal
+                        'chat-green': '#10b981', // Verde de destaque (Glow/Ação)
+                        'chat-surface-dark': 'rgba(26, 26, 26, 0.95)', // Fundo escuro semi-sólido
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Importa a fonte Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Oculta a barra de rolagem em navegadores baseados em WebKit */
+        #chat-window::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Oculta a barra de rolagem no Firefox */
+        #chat-window {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        /* Efeito de Fundo: Radial Gradient para o efeito escuro e profundo */
+        body {
+            background-color: #0a1917;
+            background-image: radial-gradient(circle at 50% 50%, #173b2c 0%, #0a1917 70%);
+        }
+
+        /* Efeito Glassmorphism para o Container Principal */
+        .glass-container {
+            background-color: rgba(26, 26, 26, 0.6); /* Fundo semi-transparente */
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.6), 0 0 100px rgba(16, 185, 129, 0.1); /* Glow principal */
+            backdrop-filter: blur(12px); /* Desfoque */
+            -webkit-backdrop-filter: blur(12px); /* Para Safari */
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* Efeito Glassmorphism para o rodapé (área de input) */
+        .input-footer {
+            background-color: rgba(18, 18, 18, 0.95); /* Quase sólido */
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(16, 185, 129, 0.4); /* Borda brilhante */
+        }
+        
+        /* Input Field (Fundo Escuro Transparente) */
+        #user-input {
+             background-color: rgba(30, 30, 30, 0.9);
+        }
+
+        /* Botão de Envio (Com Glow) */
+        .send-button-glow {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.8), 0 0 5px rgba(16, 185, 129, 0.8) inset;
+        }
+
+        .send-button-glow:hover {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 1), 0 0 8px rgba(16, 185, 129, 1) inset;
+        }
+
+    </style>
+</head>
+<body class="bg-deep-dark font-sans flex items-center justify-center min-h-screen p-4">
+
+    <!-- Container Principal do Chat (Glassmorphism + Glow) -->
+    <div id="chat-container" class="w-full max-w-lg mx-auto glass-container rounded-[30px] flex flex-col h-[90vh] max-h-[800px]">
+        
+        <!-- Cabeçalho (Mascote e Título) -->
+        <header class="p-6 bg-chat-surface-dark rounded-t-[30px] flex flex-col items-center justify-center border-b border-chat-border">
+            <!-- Imagem da Capivara Bot sem fundo -->
+            <img src="capivara.png" 
+                 onerror="this.onerror=null;this.src='https://placehold.co/100x100/10b981/ffffff?text=Capivara';"
+                 alt="Capivara Bot - Assistente de Construção" 
+                 class="w-48 h-48 object-contain rounded-full shadow-lg mb-3 ring-4 ring-chat-green/50"
+            >
+            <h1 class="text-2xl font-extrabold text-white tracking-wider">Capivara Bot</h1>
+            <p class="text-sm text-gray-400">Pronta para te ajudar a construir o futuro.</p>
+        </header>
+
+        <!-- Janela de Mensagens (Chat Window) -->
+        <div id="chat-window" class="flex-grow p-4 md:p-6 overflow-y-auto space-y-4">
+            <!-- Mensagem de boas-vindas inicial do bot -->
+            <div class="flex justify-start">
+                <div class="max-w-[80%] bg-white/10 text-white p-3 rounded-t-xl rounded-br-xl shadow-lg border border-white/20">
+                    Olá! Sou a Capivara Bot. No que posso te ajudar com seus projetos de construção hoje?
+                </div>
+            </div>
+            <!-- As mensagens serão injetadas aqui -->
+        </div>
+
+        <!-- Área de Input da Mensagem (Glassmorphism no rodapé) -->
+        <footer class="p-4 input-footer rounded-b-[30px]">
+            <div class="flex items-center space-x-3">
+                <input type="text" id="user-input" placeholder="Pergunte qualquer coisa..." 
+                       class="flex-grow p-3 text-white border border-chat-green/50 rounded-xl focus:ring-2 focus:ring-chat-green transition duration-200 placeholder-gray-500 shadow-inner"
+                       onkeydown="if(event.key === 'Enter') sendMessage()">
+                
+                <!-- Botão de Envio/Loading Indicator (Glow Effect) -->
+                <button id="send-button" onclick="sendMessage()" 
+                        class="bg-chat-green hover:bg-chat-green-dark text-white font-bold p-3 rounded-xl transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-12 h-12 send-button-glow"
+                        aria-label="Enviar mensagem">
+                    <svg id="send-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                        <path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+                    </svg>
+                    <!-- Loading Spinner (Oculto por padrão) -->
+                    <svg id="loading-spinner" class="animate-spin h-6 w-6 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Script para o Chatbot com Gemini API -->
+    <script>
+        // VERIFICAÇÃO DE AUTENTICAÇÃO
+        function getCookie(name) {
+            const nameEQ = name + '=';
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.indexOf(nameEQ) === 0) {
+                    return cookie.substring(nameEQ.length);
+                }
+            }
+            return null;
+        }
+
+        // Verificar autenticação ao carregar
+        window.addEventListener('load', () => {
+            const authToken = getCookie('auth_token');
+            if (!authToken) {
+                window.location.href = '/login.html';
+                return;
+            }
+        });
+
+        // Variáveis globais
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const sendIcon = document.getElementById('send-icon');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        
+        let chatHistory = [];
+        let isSending = false;
+
+        // Configurações do SDK do Firebase e Inicialização (Requerido para o Gemini API Key na Canvas)
+        const apiKey = ""; // Deixe em branco, a Canvas injetará a chave.
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // --- Funções de UI ---
+
+        /**
+         * Adiciona uma mensagem à janela do chat.
+         * @param {string} text - O conteúdo da mensagem.
+         * @param {string} sender - 'user' ou 'bot'.
+         */
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+
+            // Estilos Glassy/Dark
+            const bubbleClass = sender === 'user'
+                ? 'bg-chat-green text-white p-3 rounded-t-xl rounded-bl-xl shadow-lg border border-chat-green/50'
+                : 'bg-white/10 text-white p-3 rounded-t-xl rounded-br-xl shadow-lg border border-white/20';
+
+            messageDiv.innerHTML = `
+                <div class="max-w-[80%] ${bubbleClass}">
+                    ${text.trim()}
+                </div>
+            `;
+            chatWindow.appendChild(messageDiv);
+            
+            // Rola a janela para a mensagem mais recente
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        /**
+         * Alterna o estado de carregamento do botão de envio.
+         * @param {boolean} loading - Se o chat está carregando ou não.
+         */
+        function setLoading(loading) {
+            isSending = loading;
+            sendButton.disabled = loading;
+            if (loading) {
+                sendIcon.classList.add('hidden');
+                loadingSpinner.classList.remove('hidden');
+            } else {
+                sendIcon.classList.remove('hidden');
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // --- Lógica do Chatbot ---
+
+        /**
+         * Envia a mensagem do usuário e chama a Gemini API.
+         */
+        async function sendMessage() {
+            const userText = userInput.value.trim();
+            if (userText === '' || isSending) return;
+
+            // 1. Adiciona a mensagem do usuário ao chat e limpa o input
+            addMessage(userText, 'user');
+            userInput.value = '';
+            setLoading(true);
+
+            // 2. Adiciona a mensagem do usuário ao histórico do chat
+            chatHistory.push({ role: "user", parts: [{ text: userText }] });
+
+            // 3. Monta o payload para a API
+            const payload = {
+                contents: chatHistory,
+                // Adiciona o Google Search para respostas baseadas em dados atuais (grounding)
+                tools: [{ "google_search": {} }], 
+                systemInstruction: {
+                    parts: [{ text: "Você é a Capivara Bot, um assistente de IA amigável e experiente em projetos de construção civil, planejamento e gestão. Responda em português, de forma útil e concisa, mantendo um tom encorajador. Se a pergunta for sobre um tema não relacionado à construção, tente dar uma resposta simples ou redirecione para o tema." }]
+                }
+            };
+
+            // 4. Lógica de Exponential Backoff para tentar a chamada da API
+            const MAX_RETRIES = 3;
+            let response;
+            for (let i = 0; i < MAX_RETRIES; i++) {
+                try {
+                    response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (response.status === 429) {
+                        // Too Many Requests, tenta novamente após o delay
+                        const delay = Math.pow(2, i) * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
+                    }
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP: ${response.status}`);
+                    }
+                    break; 
+
+                } catch (error) {
+                    console.error('Erro ao chamar a API (tentativa ${i + 1}):', error);
+                    if (i === MAX_RETRIES - 1) {
+                        setLoading(false);
+                        addMessage('Desculpe, a Capivara Bot teve um problema de conexão. Tente novamente mais tarde.', 'bot');
+                        return;
+                    }
+                    const delay = Math.pow(2, i) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+
+            // 5. Processa a resposta
+            try {
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+                let botText = "Desculpe, não consegui processar sua solicitação.";
+                
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    botText = candidate.content.parts[0].text;
+                }
+
+                // 6. Adiciona a resposta do bot ao chat e ao histórico
+                addMessage(botText, 'bot');
+                chatHistory.push({ role: "model", parts: [{ text: botText }] });
+
+            } catch (error) {
+                console.error("Erro ao analisar a resposta da API:", error);
+                addMessage('Ops! Houve um erro ao processar a resposta do servidor.', 'bot');
+            } finally {
+                setLoading(false);
+            }
+        }
+    </script>
+</body>
+</html>

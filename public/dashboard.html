@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capivara Dashboard - SaaS</title>
+    <link rel="icon" href="capivara.ico" type="image/x-icon">
+    <!-- Carrega o Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuração do tema (Cores escuras e brilho) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Cores base escuras
+                        'deep-dark': '#0a1917', // Fundo principal
+                        'chat-green': '#10b981', // Verde de destaque (Glow/Ação)
+                        'chat-surface-dark': 'rgba(26, 26, 26, 0.95)', // Fundo escuro semi-sólido
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Importa a fonte Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Efeito de Fundo: Radial Gradient para o efeito escuro e profundo */
+        body {
+            background-color: #0a1917;
+            background-image: radial-gradient(circle at 50% 50%, #173b2c 0%, #0a1917 70%);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Efeito Glassmorphism para o Container Principal */
+        .glass-container {
+            background-color: rgba(26, 26, 26, 0.6); /* Fundo semi-transparente */
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.6), 0 0 100px rgba(16, 185, 129, 0.1); /* Glow principal */
+            backdrop-filter: blur(12px); /* Desfoque */
+            -webkit-backdrop-filter: blur(12px); /* Para Safari */
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* Estilo para links do menu */
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #d1d5db; /* gray-300 */
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .menu-link:hover, .menu-link.active {
+            background-color: rgba(16, 185, 129, 0.2); /* chat-green com 20% de opacidade */
+            color: #ffffff;
+        }
+
+        .menu-link.active {
+            border-left: 4px solid #10b981;
+            background-color: rgba(16, 185, 129, 0.3);
+        }
+
+        /* Estilo para submenus */
+        .submenu {
+            padding-left: 1.5rem;
+            border-left: 2px solid rgba(16, 185, 129, 0.4);
+        }
+
+        /* Estilo para a bolha de conversa da capivara */
+        .capivara-bubble {
+            position: relative;
+            background-color: rgba(26, 26, 26, 0.8);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            color: white;
+            max-width: 70%;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .capivara-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid rgba(26, 26, 26, 0.8);
+        }
+
+        /* Módulo Container */
+        .module-container {
+            display: none;
+        }
+
+        .module-container.active {
+            display: block;
+        }
+
+        /* Loading state */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(16, 185, 129, 0.2);
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Navbar logout */
+        .navbar {
+            background-color: rgba(26, 26, 26, 0.95);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-deep-dark font-sans flex min-h-screen flex-col">
+
+    <!-- Navbar Topo -->
+    <nav class="navbar sticky top-0 z-50 px-8 py-4 flex justify-between items-center">
+        <div class="flex items-center">
+            <img src="capivara.png" alt="Capivara Logo" class="w-10 h-10 object-contain mr-3" onerror="this.src='https://placehold.co/40x40/10b981/ffffff?text=C'">
+            <h1 class="text-2xl font-extrabold text-white">CapivaraFlow</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span id="user-info" class="text-gray-400">Bem-vindo!</span>
+            <button onclick="logout()" class="bg-chat-green hover:bg-chat-green/80 text-deep-dark font-bold px-4 py-2 rounded-lg transition">
+                Sair
+            </button>
+        </div>
+    </nav>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar de Navegação (Menu) -->
+        <aside class="w-64 bg-chat-surface-dark p-6 flex flex-col overflow-y-auto shadow-lg border-r border-chat-green/20">
+            
+            <nav class="flex-grow">
+                <h2 class="text-sm font-semibold text-gray-500 uppercase mb-4">Menu Principal</h2>
+                <ul id="modules-list" class="space-y-2">
+                    <!-- Módulos serão carregados aqui dinamicamente -->
+                </ul>
+            </nav>
+
+            <div class="border-t border-chat-green/20 pt-4 mt-6">
+                <p class="text-xs text-gray-500">CapivaraFlow v1.0</p>
+                <p class="text-xs text-gray-500">© 2026 - Todos os direitos reservados</p>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="flex-grow p-8 overflow-y-auto">
+            <div id="dashboard-content" class="glass-container rounded-[20px] p-8">
+                
+                <!-- Seção de Boas-vindas -->
+                <div id="welcome-section" class="module-container active">
+                    <h1 class="text-4xl font-extrabold text-white mb-6">Bem-vindo ao CapivaraFlow! 🦫</h1>
+                    <p class="text-gray-300 text-lg mb-8">Selecione um módulo no menu lateral para começar.</p>
+                    
+                    <!-- Seção de Frase Motivacional -->
+                    <div class="flex items-end space-x-4 mt-12">
+                        <img src="capivara.png" alt="Capivara Bot" class="w-24 h-24 object-contain rounded-full shadow-lg ring-4 ring-chat-green/50" onerror="this.src='https://placehold.co/100x100/10b981/ffffff?text=Capivara'">
+                        <div id="motivational-phrase" class="capivara-bubble">
+                            A persistência é o caminho do êxito.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Container de módulos -->
+                <div id="modules-content"></div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Script -->
+    <script>
+        // CONFIGURAÇÃO DE COOKIES
+        function setCookie(name, value, days = 7) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + '=';
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.indexOf(nameEQ) === 0) {
+                    return cookie.substring(nameEQ.length);
+                }
+            }
+            return null;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Strict`;
+        }
+
+        // CONFIGURAÇÃO
+        const API_URL = 'http://localhost:5000/api'; // Backend Flask
+        const MODULES = [
+            { id: 'home', name: 'Dashboard', icon: '📊' },
+            { id: 'relatorio-acidentes', name: 'Relatório de Acidentes', icon: '📈' },
+            { id: 'produtos', name: 'Produtos', icon: '📋' },
+        ];
+
+        // INICIALIZAÇÃO
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuthentication();
+            loadModules();
+            loadUserInfo();
+        });
+
+        // AUTENTICAÇÃO
+        function checkAuthentication() {
+            const token = getCookie('auth_token');
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+        }
+
+        function loadUserInfo() {
+            const email = getCookie('user_email');
+            if (email) {
+                document.getElementById('user-info').textContent = `Usuário: ${email}`;
+            }
+        }
+
+        function logout() {
+            deleteCookie('auth_token');
+            deleteCookie('user_email');
+            window.location.href = '/login.html';
+        }
+
+        // CARREGAMENTO DE MÓDULOS
+        function loadModules() {
+            const modulesList = document.getElementById('modules-list');
+            modulesList.innerHTML = '';
+
+            MODULES.forEach(module => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <a onclick="loadModule('${module.id}')" class="menu-link ${module.id === 'home' ? 'active' : ''}">
+                        <span class="mr-3">${module.icon}</span>
+                        <span>${module.name}</span>
+                    </a>
+                `;
+                modulesList.appendChild(li);
+            });
+        }
+
+        function loadModule(moduleId) {
+            // Atualiza menu ativo
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.closest('.menu-link')?.classList.add('active');
+
+            // Esconde welcome section
+            document.getElementById('welcome-section').classList.remove('active');
+
+            // Caso home
+            if (moduleId === 'home') {
+                document.getElementById('welcome-section').classList.add('active');
+                document.getElementById('modules-content').innerHTML = '';
+                return;
+            }
+
+            // Carrega módulo
+            const modulesContent = document.getElementById('modules-content');
+            modulesContent.innerHTML = '<div class="loading"></div>';
+
+            // Simula carregamento de módulo (pode ser substituído por iframe ou chamada API)
+            setTimeout(() => {
+                if (moduleId === 'relatorio-acidentes') {
+                    loadAccidentsModule();
+                } else if (moduleId === 'produtos') {
+                    loadProductsModule();
+                }
+            }, 500);
+        }
+
+        function loadAccidentsModule() {
+            const modulesContent = document.getElementById('modules-content');
+            modulesContent.innerHTML = `
+                <div class="space-y-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white mb-4">Relatório de Acidentes de Trânsito 2025</h2>
+                        <p class="text-gray-400 mb-6">Análise detalhada de acidentes viários do ano de 2025.</p>
+                    </div>
+                    <iframe src="/modules/relatorio-acidentes.html" 
+                            class="w-full h-screen rounded-lg border border-chat-green/20"
+                            frameborder="0" 
+                            style="min-height: 800px;">
+                    </iframe>
+                </div>
+            `;
+        }
+
+        function loadProductsModule() {
+            const modulesContent = document.getElementById('modules-content');
+            modulesContent.innerHTML = `
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-bold text-white">Produtos</h2>
+                    <p class="text-gray-400">Módulo de produtos em desenvolvimento.</p>
+                </div>
+            `;
+        }
+
+        // Carrega frases motivacionais
+        async function loadMotivationalPhrases() {
+            try {
+                const response = await fetch('/phrases.json');
+                const phrases = await response.json();
+                if (phrases.length > 0) {
+                    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+                    document.getElementById('motivational-phrase').textContent = randomPhrase;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar frases:', error);
+            }
+        }
+
+        // Garante que a primeira página de boas-vindas está visível ao carregar
+        window.addEventListener('load', () => {
+            loadMotivationalPhrases();
+        });
+    </script>
+</body>
+</html>

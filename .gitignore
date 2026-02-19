@@ -1,0 +1,62 @@
+# Ambiente Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Dependências
+node_modules/
+package-lock.json
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Dados temporários
+*.tmp
+*.temp
+temp/
+
+# Cache
+.cache/
+*.cache
+
+# Arquivos de compilação
+dist/
+build/
+
+# Sincronização de pasta
+desktop.ini
+Thumbs.db

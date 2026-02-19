@@ -1,0 +1,217 @@
+{
+  "data_extracao": "19/02/2026 16:47:19",
+  "arquivo": "csv_limpo.csv",
+  "total_registros": 2963,
+  "colunas": [
+    "id",
+    "pesid",
+    "data_inversa",
+    "dia_semana",
+    "horario",
+    "uf",
+    "br",
+    "km",
+    "municipio",
+    "causa_principal",
+    "causa_acidente",
+    "ordem_tipo_acidente",
+    "tipo_acidente",
+    "classificacao_acidente",
+    "fase_dia",
+    "sentido_via",
+    "condicao_metereologica",
+    "tipo_pista",
+    "tracado_via",
+    "uso_solo",
+    "id_veiculo",
+    "tipo_veiculo",
+    "marca",
+    "ano_fabricacao_veiculo",
+    "tipo_envolvido",
+    "estado_fisico",
+    "idade",
+    "sexo",
+    "ilesos",
+    "feridos_leves",
+    "feridos_graves",
+    "mortos",
+    "latitude",
+    "longitude",
+    "regional",
+    "delegacia",
+    "uop"
+  ],
+  "slides": {
+    "slide_1": {
+      "nome": "Título",
+      "titulo": "Acidentes de Trânsito",
+      "subtitulo": "Análise Completa 2025",
+      "rodape": "Estratégica Engenharia • Dados SPRF-PR"
+    },
+    "slide_2": {
+      "nome": "Indicadores Principais",
+      "kpis": {
+        "total_acidentes": 2963,
+        "total_obitos": 73,
+        "feridos_graves": 251,
+        "feridos_leves": 1368,
+        "ilesos": 1263,
+        "taxa_severidade": 2.5,
+        "total_vitimas": 2882,
+        "taxa_mortalidade": 2.5
+      }
+    },
+    "slide_3": {
+      "nome": "Tipos de Acidentes",
+      "dados": {
+        "Saída de leito carroçável": {
+          "quantidade": 536,
+          "percentual": 28
+        },
+        "Colisão traseira": {
+          "quantidade": 413,
+          "percentual": 22
+        },
+        "Colisão com objeto": {
+          "quantidade": 384,
+          "percentual": 20
+        },
+        "Capotamento": {
+          "quantidade": 313,
+          "percentual": 17
+        },
+        "Colisão frontal": {
+          "quantidade": 244,
+          "percentual": 13
+        }
+      }
+    },
+    "slide_4": {
+      "nome": "Causas Principais",
+      "dados": {
+        "Reação tardia ou ineficiente do condutor": {
+          "quantidade": 420,
+          "percentual": 30
+        },
+        "Velocidade Incompatível": {
+          "quantidade": 397,
+          "percentual": 28
+        },
+        "Ausência de reação do condutor": {
+          "quantidade": 272,
+          "percentual": 19
+        },
+        "Acessar a via sem observar a presença dos outros veículos": {
+          "quantidade": 173,
+          "percentual": 12
+        },
+        "Ingestão de álcool pelo condutor": {
+          "quantidade": 160,
+          "percentual": 11
+        }
+      }
+    },
+    "slide_5": {
+      "nome": "Estradas Críticas",
+      "dados": {
+        "BR-277": {
+          "acidentes": 937,
+          "obitos": 3,
+          "feridos": 85
+        },
+        "BR-376": {
+          "acidentes": 687,
+          "obitos": 2,
+          "feridos": 53
+        },
+        "BR-116": {
+          "acidentes": 414,
+          "obitos": 12,
+          "feridos": 9
+        },
+        "BR-369": {
+          "acidentes": 275,
+          "obitos": 26,
+          "feridos": 39
+        },
+        "BR-476": {
+          "acidentes": 190,
+          "obitos": 5,
+          "feridos": 31
+        }
+      }
+    },
+    "slide_6": {
+      "nome": "Condições Meteorológicas",
+      "dados": {
+        "Céu Claro": {
+          "quantidade": 1477,
+          "percentual": 53
+        },
+        "Nublado": {
+          "quantidade": 678,
+          "percentual": 24
+        },
+        "Chuva": {
+          "quantidade": 448,
+          "percentual": 16
+        },
+        "Garoa/Chuvisco": {
+          "quantidade": 190,
+          "percentual": 7
+        }
+      }
+    },
+    "slide_7": {
+      "nome": "Distribuição por Fase do Dia",
+      "dados": {
+        "Pleno dia": {
+          "quantidade": 1522,
+          "percentual": 52
+        },
+        "Plena Noite": {
+          "quantidade": 1110,
+          "percentual": 38
+        },
+        "Anoitecer": {
+          "quantidade": 201,
+          "percentual": 7
+        },
+        "Amanhecer": {
+          "quantidade": 122,
+          "percentual": 4
+        }
+      }
+    },
+    "slide_8": {
+      "nome": "Municípios Mais Afetados",
+      "dados": {
+        "GUARAPUAVA": {
+          "acidentes": 191,
+          "percentual": 6.4,
+          "obitos": 0
+        },
+        "CAMPINA GRANDE DO SUL": {
+          "acidentes": 177,
+          "percentual": 6.0,
+          "obitos": 9
+        },
+        "GUARATUBA": {
+          "acidentes": 164,
+          "percentual": 5.5,
+          "obitos": 0
+        },
+        "CURITIBA": {
+          "acidentes": 153,
+          "percentual": 5.2,
+          "obitos": 0
+        },
+        "PONTA GROSSA": {
+          "acidentes": 122,
+          "percentual": 4.1,
+          "obitos": 0
+        }
+      }
+    }
+  }
+}

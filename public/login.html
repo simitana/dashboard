@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capivara Login</title>
+    <!-- Carrega o Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuração do tema (Cores escuras e brilho) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Cores base escuras
+                        'deep-dark': '#0a1917', // Fundo principal
+                        'chat-green': '#10b981', // Verde de destaque (Glow/Ação)
+                        'chat-surface-dark': 'rgba(26, 26, 26, 0.95)', // Fundo escuro semi-sólido
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Importa a fonte Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        /* Efeito de Fundo: Radial Gradient para o efeito escuro e profundo */
+        body {
+            background-color: #0a1917;
+            background-image: radial-gradient(circle at 50% 50%, #173b2c 0%, #0a1917 70%);
+        }
+
+        /* Efeito Glassmorphism para o Container Principal */
+        .glass-container {
+            background-color: rgba(26, 26, 26, 0.6); /* Fundo semi-transparente */
+            /* Adiciona o Glow de destaque verde */
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.6), 0 0 100px rgba(16, 185, 129, 0.1); 
+            backdrop-filter: blur(12px); /* Desfoque */
+            -webkit-backdrop-filter: blur(12px); /* Para Safari */
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* Efeito de brilho no botão de Entrar */
+        .glow-button {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+            transition: all 0.3s ease;
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 1);
+            transform: translateY(-1px);
+        }
+
+        /* Estilo para inputs focados */
+        input:focus {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-deep-dark font-sans flex items-center justify-center min-h-screen p-4">
+
+    <!-- Container Principal do Formulário (Glassmorphism + Glow) -->
+    <div class="w-full max-w-sm mx-auto p-8 md:p-10 glass-container rounded-[20px] flex flex-col items-center">
+        
+        <!-- Imagem da Capivara (com alternância ao focar na senha) -->
+        <img id="capivara-image" 
+             src="capivara.png" 
+             alt="Capivara Bot - Olhos Abertos" 
+             class="w-36 h-36 object-cover rounded-full mb-6 transition-all duration-300 ring-4 ring-chat-green/50"
+             onerror="this.src='https://placehold.co/150x150/10b981/ffffff?text=Capivara'"
+        >
+
+        <h1 class="text-3xl font-extrabold text-white tracking-wider mb-2">Acesso Capivara</h1>
+        <p class="text-sm text-gray-400 mb-8">Faça seu login para continuar.</p>
+
+        <!-- Formulário de Login -->
+        <form class="w-full space-y-5" onsubmit="handleLogin(event)">
+            
+            <!-- Campo de Email/Usuário -->
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-300 mb-1">Usuário / Email</label>
+                <input type="text" id="username" placeholder="seu@email.com" 
+                       class="w-full p-3 text-white bg-black/30 border border-chat-green/50 rounded-lg shadow-inner placeholder-gray-500 transition duration-200 outline-none focus:ring-0"
+                       required>
+            </div>
+            
+            <!-- Campo de Senha (Com interatividade da Capivara) -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-300 mb-1">Senha</label>
+                <input type="password" id="password-input" placeholder="********" 
+                       class="w-full p-3 text-white bg-black/30 border border-chat-green/50 rounded-lg shadow-inner placeholder-gray-500 transition duration-200 outline-none focus:ring-0"
+                       required
+                       onfocus="handleFocus(true)"
+                       onblur="handleFocus(false)">
+                       onfocus="handleFocus(true)"
+                       onblur="handleFocus(false)">
+            </div>
+            
+            <!-- Botão de Entrar -->
+            <button type="submit" 
+                    class="w-full bg-chat-green text-deep-dark font-extrabold py-3 rounded-lg mt-6 uppercase glow-button hover:bg-chat-green/90">
+                Entrar
+            </button>
+        </form>
+
+    </div>
+
+    <!-- Script de Interação -->
+    <script>
+        const imageElement = document.getElementById('capivara-image');
+        const passwordInput = document.getElementById('password-input');
+
+        // URLs de Placeholder simulando as duas imagens
+        const defaultSrc = 'capivara.png';
+        const focusedSrc = 'capivaraOlhosFechados.png';
+
+        function handleFocus(isFocused) {
+            if (isFocused) {
+                imageElement.src = focusedSrc;
+                imageElement.alt = "Capivara Bot - Olhos Fechados";
+                imageElement.classList.remove('ring-chat-green/50');
+                imageElement.classList.add('ring-gray-700'); 
+            } else {
+                imageElement.src = defaultSrc;
+                imageElement.alt = "Capivara Bot - Olhos Abertos";
+                imageElement.classList.remove('ring-gray-700');
+                imageElement.classList.add('ring-chat-green/50'); 
+            }
+        }
+
+        // Credenciais hardcoded
+        const VALID_EMAIL = 'biancadlourenco@gmail.com';
+        const VALID_PASSWORD = 'Bianca123';
+
+        function setCookie(name, value, days = 7) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + '=';
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.indexOf(nameEQ) === 0) {
+                    return cookie.substring(nameEQ.length);
+                }
+            }
+            return null;
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('username').value;
+            const password = document.getElementById('password-input').value;
+            
+            // Validar credenciais
+            if (email === VALID_EMAIL && password === VALID_PASSWORD) {
+                // Criar cookie de autenticação
+                setCookie('auth_token', btoa(`${email}:${password}`), 7);
+                setCookie('user_email', email, 7);
+                window.location.href = '/dashboard.html';
+            } else {
+                // Mostrar erro
+                alert('❌ Email ou senha inválidos!');
+                document.getElementById('password-input').value = '';
+            }
+        }
+
+        // Verificar se já está autenticado ao carregar a página
+        window.addEventListener('load', () => {
+            const authToken = getCookie('auth_token');
+            if (authToken) {
+                // Já está logado, redirecionar para dashboard
+                window.location.href = '/dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>
