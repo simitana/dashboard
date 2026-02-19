@@ -1178,7 +1178,7 @@ Taxa de Severidade: ${{dashboardData.kpis.taxa_severidade}}%
         
         return html
     
-    def salvar_dashboard(self, nome_arquivo='dashboard.html'):
+    def salvar_dashboard(self, nome_arquivo='index.html'):
         """Salva o dashboard HTML em um arquivo"""
         try:
             html = self.gerar_html_dashboard()
@@ -1219,7 +1219,7 @@ def main():
     print("🎨 GERANDO ARQUIVO HTML")
     print("=" * 80)
     
-    if gerador.salvar_dashboard('dashboard.html'):
+    if gerador.salvar_dashboard('index.html'):
         print("\n" + "=" * 80)
         print("✅ SUCESSO!")
         print("=" * 80)
@@ -1231,7 +1231,7 @@ def main():
         print(f"   • Causas Principais: {len(gerador.dados_dashboard['causas_principais'])}")
         print(f"   • Estradas Críticas: {len(gerador.dados_dashboard['estradas_criticas'])}")
         print(f"   • Municípios: {len(gerador.dados_dashboard['municipios'])}")
-        print("\n🌐 Abra 'dashboard.html' em seu navegador!\n")
+        print("\n🌐 Abra 'index.html' em seu navegador!\n")
 
 
 if __name__ == "__main__":
